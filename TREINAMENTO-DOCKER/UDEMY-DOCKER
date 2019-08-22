@@ -1,0 +1,92 @@
+### Curso Docker UDEMY ###
+Apostila do Curso: http://files.cod3r.com.br/apostila-docker.pdf
+
+Repositório do Curso: https://github.com/cod3rcursos/curso-docker
+
+
+########### Acessar pasta desejada ###########
+$ cd /home/abimael/Desktop/ex-volume
+
+########### Criar pasta html ###########
+$ mkdir html
+$ cd html
+
+################# Subindo nginx modo daemon e mapeando porta e volume #################
+$ docker run -d --name ex-daemon-basic -p 8080:80 -v $(pwd)/html:/usr/share/nginx/html nginx
+
+######## Listar container > (Sintaxe nova) ########
+$ docker container ls
+$ docker container list
+$ docker container ps
+
+####### Verificar log do container #########
+$ docker container logs ex-daemon-basic -f
+
+####### Especionar o container #######
+$ docker container inspect ex-daemon-basic
+
+####### Executar comando dentro de um container #######
+docker container exec ex-daemon-basic uname -or
+docker container exec ex-daemon-basic hostname
+
+#### Baixar uma imagem do repositorio dockerhub ####
+docker image pull redis:latest
+
+#### Aplicar uma tag para uma imagem baixada ####
+docker image tag redis:latest cod3r-redis
+
+Verificar a nova imagem:
+
+root@ico-abimael-ubuntu:/home/abimael/Desktop/ex-volume# docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+cod3r-redis         latest              f7302e4ab3a8        7 days ago          98.2MB
+
+#### Excluir imagens ####
+$ docker image rm redis:latest cod3r-redis
+
+### Verificar imagens excluidas ###
+$ docker image ls
+
+### Algums comandos: ###
+$ docker image pull      > baixar imagem
+$ docker image ls        > listar imagens
+$ docker image rm        > remove imagem
+$ docker image inspect   > infos da imagem
+$ docker image tag       > aplicar uma tag para uma image
+$ docker image build     > Le um arquivo descritos do docker, vai contruir uma imagem.
+$ docker image push      > Voce consegue subir a imagem para um registry, dockerhub por exemplo.
+
+### Primeiro Build  Criando a primeira Imagem (criando um descritor) ###
+Dentro de um workdir especifico, vamos criar o arquivo Dockerfile
+
+Conteudo do Dockerfile:
+FROM nginx:latest                                                              ## A partir de qual imagem
+RUN echo '<h1> Hello World !</h1>' > /usr/share/nginx/html/index.html          ## Executar o comando, a saida desse echo vai para o arquivo mencionado, nesse caso vai criar mais uma nova layer
+
+### Buildar a imagem usando (tag -t) ## O Ponto. a partir do workdir
+$ docker image build -t ex-simple-build .
+
+### Verificar a imagem criada ###
+root@ico-abimael-ubuntu:/home/abimael/Desktop/Curso-Docker/primeiro-build# docker image ls
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+ex-simple-build     latest              943f4fefc681        10 seconds ago      126MB
+
+### Executar o container a partir dessa imagem buildada ###
+$ docker run -p 80:80 ex-simple-build
+
+## Criar nova pasta de workdir, por exemplo build-com-arg
+$ cd ~/Desktop/Curso-Docker/build-com-arg
+
+## Criar arquivo Dockerfile com algum editor desejado, conteudo do arquivo:
+FROM debian
+LABEL maintainer 'Aluno Abimael <Aluno at abimael.com.br>'
+
+ARG S3_BUCKET=files
+ENV S3_BUCKET=${S3_BUCKET}
+
+# Buildar imagem (Criar imagem)
+$ docker image build --build-arg S3_BUCKET=myapp -t ex-build-arg .
+
+## Buscar um argumento dentro da imagem criada
+$ docker image inspect --format="{{index .Config.Labels \"maintainer\"}}" ex-build-arg
+
