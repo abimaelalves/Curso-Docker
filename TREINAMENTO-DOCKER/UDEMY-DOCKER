@@ -90,3 +90,12 @@ $ docker image build --build-arg S3_BUCKET=myapp -t ex-build-arg .
 ## Buscar um argumento dentro da imagem criada
 $ docker image inspect --format="{{index .Config.Labels \"maintainer\"}}" ex-build-arg
 
+## Como Subir uma imagem para o dockerhub
+
+Buildar imagem com a tag desejada:
+$ docker image tag ex-simple-build abimasantos/simple-build:1.0
+
+# Subir imagem para dockerhub
+$ docker image push abimasantos/simple-build:1.0
+
+Apos isso podemos verificar a imagem no dockerhub
