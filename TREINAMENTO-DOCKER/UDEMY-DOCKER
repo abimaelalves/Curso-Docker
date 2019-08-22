@@ -99,3 +99,47 @@ $ docker image tag ex-simple-build abimasantos/simple-build:1.0
 $ docker image push abimasantos/simple-build:1.0
 
 Apos isso podemos verificar a imagem no dockerhub
+
+### REDES ###
+### Listar drivers de rede do docker ###
+$ docker network ls
+
+## Subir um container para teste, imagem do alpine, --rm para remover ele apos executar o comando, -c "executar comando" ###
+docker run --rm alpine ash -c "ifconfig"
+
+### Subir container sem um rede especifica, usar (--net none) CONTAINER FICA ISOLADO ###
+docker run --rm --net none alpine ash -c "ifconfig"
+
+### Especionar rede ###
+docker network inspect bridge
+
+### Subir um container1
+docker run -d --name container1 alpine sleep 1000
+
+# Executar comando ifconfig dentro do container1
+docker exec -it container1 ifconfig
+
+## Pingar um container
+docker exec -it container2 ping 172.17.0.3
+ou pingar para um site externo
+docker exec -it container2 ping www.google.com
+
+### Criar uma nova rede para o docker ###
+docker network create --driver bridge rede_nova
+
+### Verificar infos da rede_nova ###
+docker inspect rede_nova
+
+### Subir container3 com nova rede
+docker run -d --name container3 --net rede_nova alpine sleep 1000
+
+### Configurar o container3 para ele se conectar na rede bridge, nesse caso ele vai mostrar que o container3 está com duas interfaces de rede
+docker network connect bridge container3
+
+Desconectar da rede bridge especifica:
+docker network disconnect bridge container3
+
+
+
+
+
